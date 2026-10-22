@@ -226,8 +226,8 @@ class ExchangeRateApiProvider:
 
 class OpenExchangeRatesProvider:
     """
-    Open Exchange Rates historical endpoint — recommended for production apps.
-    Requires OPEN_EXCHANGE_RATES_APP_ID. Covers USD, INR, AED, and 160+ others.
+    Open Exchange Rates — App ID required.
+    Free plan: USD base + latest. Historical endpoint usually needs a paid plan.
     """
 
     name = "openexchangerates"
@@ -240,20 +240,57 @@ class OpenExchangeRatesProvider:
         if from_currency == to_currency:
             return RateResult(Decimal("1"), on)
 
-        url = f"{self.base_url}/historical/{on.isoformat()}.json"
-        params = {"app_id": self.app_id, "base": "USD", "symbols": f"{from_currency},{to_currency}"}
-        with httpx.Client(timeout=15.0, follow_redirects=True) as client:
-            response = client.get(url, params=params)
-            response.raise_for_status()
-            payload = response.json()
+        warning: str | None = None
+        today = date.today()
+        symbols = ",".join(sorted({from_currency, to_currency} - {"USD"})) or "EUR"
 
+        if on < today:
+            try:
+                return self._from_payload(
+                    self._fetch(f"/historical/{on.isoformat()}.json", symbols),
+                    from_currency,
+                    to_currency,
+                )
+            except Exception:
+                warning = (
+                    "Open Exchange Rates free plan may not include historical rates. "
+                    "Returned latest mid-market rate, not the selected date."
+                )
+
+        return self._from_payload(
+            self._fetch("/latest.json", symbols),
+            from_currency,
+            to_currency,
+            warning=warning,
+        )
+
+    def _fetch(self, path: str, symbols: str) -> dict:
+        params = {"app_id": self.app_id, "base": "USD", "symbols": symbols}
+        with httpx.Client(timeout=15.0, follow_redirects=True) as client:
+            response = client.get(f"{self.base_url}{path}", params=params)
+            if response.status_code >= 400:
+                try:
+                    detail = response.json()
+                    message = detail.get("description") or detail.get("message") or response.text
+                except Exception:  # noqa: BLE001
+                    message = response.text
+                raise RuntimeError(f"OXR {response.status_code}: {message}")
+            return response.json()
+
+    def _from_payload(
+        self,
+        payload: dict,
+        from_currency: str,
+        to_currency: str,
+        warning: str | None = None,
+    ) -> RateResult:
         rates = payload["rates"]
-        # OXR free plans are USD-based; cross via USD.
+        # Free plans are USD-based; cross-convert via USD.
         usd_from = Decimal("1") if from_currency == "USD" else Decimal(str(rates[from_currency]))
         usd_to = Decimal("1") if to_currency == "USD" else Decimal(str(rates[to_currency]))
         rate = _quantize_rate(usd_to / usd_from)
         rate_date = datetime.fromtimestamp(payload["timestamp"], tz=timezone.utc).date()
-        return RateResult(rate, rate_date)
+        return RateResult(rate, rate_date, warning=warning)
 
 
 def get_provider() -> FxProvider:
