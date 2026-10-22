@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface ConvertResult {
   amount: string;
@@ -23,7 +24,7 @@ export interface CurrencyList {
 @Injectable({ providedIn: 'root' })
 export class CurrencyService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://127.0.0.1:43125/api';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   listCurrencies(): Observable<CurrencyList> {
     return this.http.get<CurrencyList>(`${this.baseUrl}/currencies/`);
