@@ -33,9 +33,11 @@ export class AppComponent implements OnInit {
         this.currencies.set(res.currencies);
         this.provider.set(res.provider);
       },
-      error: () => {
+      error: (err) => {
+        const detail = err?.error?.detail;
         this.error.set(
-          'Cannot reach Django API on port 43125. Start the backend first.'
+          detail ||
+            'Cannot reach Django API on port 43125. Start the backend, or set EXCHANGE_RATE_API_KEY in .env.'
         );
       },
     });

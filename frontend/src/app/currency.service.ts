@@ -12,6 +12,7 @@ export interface ConvertResult {
   converted_amount: string;
   provider: string;
   note: string;
+  warning?: string;
 }
 
 export interface CurrencyList {

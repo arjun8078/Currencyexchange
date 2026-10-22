@@ -169,6 +169,14 @@ select:focus {
   padding: 0.75rem 0.9rem;
 }
 
+.state.warn {
+  color: #6a4a12;
+  background: #f7efd8;
+  border-radius: 0.7rem;
+  padding: 0.75rem 0.9rem;
+  margin-top: 0.85rem;
+}
+
 .result {
   margin-top: 1.25rem;
   padding-top: 1.15rem;

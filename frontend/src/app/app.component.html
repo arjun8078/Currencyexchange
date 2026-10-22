@@ -81,6 +81,9 @@
             <dd>{{ quote.provider }}</dd>
           </div>
         </dl>
+        @if (quote.warning) {
+          <p class="state warn" role="status">{{ quote.warning }}</p>
+        }
         <p class="hint">{{ quote.note }}</p>
       </section>
     } @else if (!error() && !loading()) {
@@ -90,8 +93,10 @@
 
   <footer>
     <p>
-      Active provider: <code>{{ provider() }}</code>. Production tip: set
-      <code>OPEN_EXCHANGE_RATES_APP_ID</code> for Open Exchange Rates (AED + audit-friendly historical).
+      Active provider: <code>{{ provider() }}</code>. Using
+      <strong>ExchangeRate-API</strong> free tier (latest mid-market). Past dates
+      need a paid plan — next we can try Open Exchange Rates or Fixer.io for
+      historical rates.
     </p>
   </footer>
 </div>
