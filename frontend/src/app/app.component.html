@@ -1,0 +1,97 @@
+<div class="page">
+  <header class="hero">
+    <p class="brand">RateDay</p>
+    <h1>Convert on the rate of the day you enter</h1>
+    <p class="lede">
+      Amounts in INR or any local currency, converted to USD, AED, or another
+      currency using the FX rate for your chosen date — via Django, not the browser.
+    </p>
+  </header>
+
+  <main class="converter">
+    <form class="form" (ngSubmit)="convert()" #f="ngForm">
+      <label>
+        <span>Amount</span>
+        <input
+          type="number"
+          name="amount"
+          [(ngModel)]="amount"
+          min="0"
+          step="0.01"
+          required
+        />
+      </label>
+
+      <div class="pair">
+        <label>
+          <span>From</span>
+          <select name="from" [(ngModel)]="from" required>
+            @for (code of currencies(); track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+        </label>
+
+        <button type="button" class="swap" (click)="swap()" aria-label="Swap currencies">
+          ⇄
+        </button>
+
+        <label>
+          <span>To</span>
+          <select name="to" [(ngModel)]="to" required>
+            @for (code of currencies(); track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label>
+        <span>Rate date</span>
+        <input type="date" name="date" [(ngModel)]="date" required />
+      </label>
+
+      <button type="submit" class="cta" [disabled]="loading()">
+        {{ loading() ? 'Converting…' : 'Convert' }}
+      </button>
+    </form>
+
+    @if (error()) {
+      <p class="state error" role="alert">{{ error() }}</p>
+    }
+
+    @if (result(); as quote) {
+      <section class="result" aria-live="polite">
+        <p class="converted">
+          {{ quote.amount }} {{ quote.from }}
+          <span>=</span>
+          <strong>{{ quote.converted_amount }} {{ quote.to }}</strong>
+        </p>
+        <dl>
+          <div>
+            <dt>Rate</dt>
+            <dd>1 {{ quote.from }} = {{ quote.rate }} {{ quote.to }}</dd>
+          </div>
+          <div>
+            <dt>Rate date</dt>
+            <dd>{{ quote.rate_date }}</dd>
+          </div>
+          <div>
+            <dt>Provider</dt>
+            <dd>{{ quote.provider }}</dd>
+          </div>
+        </dl>
+        <p class="hint">{{ quote.note }}</p>
+      </section>
+    } @else if (!error() && !loading()) {
+      <p class="state muted">Enter an amount and date, then convert.</p>
+    }
+  </main>
+
+  <footer>
+    <p>
+      Active provider: <code>{{ provider() }}</code>. Production tip: set
+      <code>OPEN_EXCHANGE_RATES_APP_ID</code> for Open Exchange Rates (AED + audit-friendly historical).
+    </p>
+  </footer>
+</div>
