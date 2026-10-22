@@ -5,7 +5,7 @@ Convert amounts in INR (or another local currency) to USD, AED, SAR, and more.
 **Default provider: [Open Exchange Rates](https://openexchangerates.org/)** (recommended for production / paid plans).  
 **Budget alternate: [ExchangeRate-API](https://www.exchangerate-api.com/)** — set `FX_PROVIDER=exchangerateapi` and `EXCHANGE_RATE_API_KEY`.
 
-See `docs/FX_PROVIDER_RECOMMENDATION.pdf` for the decision note for leads/PMs.
+See `docs/Currency_Conversion_Service_Recommendation.pdf` for the plain-language decision note for leads/PMs.
 
 ## Source code
 

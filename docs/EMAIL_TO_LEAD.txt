@@ -1,35 +1,40 @@
-Subject: Recommendation — which currency conversion service we should use (free vs paid)
+Subject: Updated recommendation — Frankfurter v2 looks best for our currency conversion (free + AED/SAR + date)
 
 Hi [Lead Name] / [PM Name],
 
-I researched three online services that give us currency conversion rates (for example: convert Indian Rupees to US Dollars or UAE Dirhams) for our product.
+I researched currency conversion services for our product (convert INR/local amounts to USD, AED, SAR, etc., using a user-selected date).
 
-The three services were:
-1. Open Exchange Rates — https://openexchangerates.org/
-2. ExchangeRate-API — https://www.exchangerate-api.com/
-3. CurrencyAPI / free community feeds (okay for demos only — not for a company product)
+Services reviewed:
+1. Frankfurter v2 — https://api.frankfurter.dev/v2/rates (free, no API key)
+2. Open Exchange Rates — https://openexchangerates.org/
+3. ExchangeRate-API — https://www.exchangerate-api.com/
+4. CurrencyAPI / free community CDN feeds (demo only — not for production)
 
-I compared them with our reference numbers (22 Oct 2026: 10,000 INR ≈ 105.43 USD / 388.90 AED). Please see the attached PDF: Currency_Conversion_Service_Recommendation.pdf.
+Thank you for pointing to the Frankfurter v2 API. That was the key detail.
 
-About the free versions
-Both Open Exchange Rates and ExchangeRate-API have free plans that are useful for testing / POC:
-- Open Exchange Rates free: about 1,000 requests per month, mainly today’s / latest rates
-- ExchangeRate-API free: about 1,500 requests per month, mainly today’s / latest rates
+Earlier confusion
+Older Frankfurter v1 (ECB-only) does not include AED/SAR, so our first check looked incomplete. Frankfurter v2 does support AED and SAR with a date parameter. We verified the sample you shared:
 
-So on free, ExchangeRate-API gives a slightly higher monthly call limit. Important: free plans are mostly for latest rates. Reliable conversion using a past date (invoice / booking date) generally needs a paid plan on both services. Free community feeds should not be used for a real company product.
+https://api.frankfurter.dev/v2/rates?base=INR&quotes=AED&date=2026-10-20
+→ rate 0.03872 → 10,000 INR = 387.20 AED
 
-My recommendation
-- For production (paid): Open Exchange Rates as our main service
-- If price is the main concern (paid): ExchangeRate-API as the budget alternative
-- For testing now (free): either free plan is fine for a POC; ExchangeRate-API free allows a few more monthly calls
+Our POC also got USD and SAR on the same date, and today’s AED was close to our reference pack (~388.90).
 
-Why Open Exchange Rates over ExchangeRate-API for production
-- Better support for converting using a past date (important for invoices / bookings), not only today’s rate
-- Better fit for a company product (clear paid service, commonly used by application backends)
-- Easier to keep a proper record: save which rate we used and on which date
-- Covers the currencies we need (INR, USD, AED, SAR, and more)
+About free vs paid
+- Frankfurter v2: free, no API key, date-based rates, includes USD/AED/SAR — strongest fit for cost right now
+- Open Exchange Rates free: about 1,000 requests/month, mainly latest rates; paid needed for stronger commercial/historical SLA
+- ExchangeRate-API free: about 1,500 requests/month, mainly latest rates; paid needed for reliable historical on their side
 
-Happy to walk through this on a short call. (Free-plan numbers above are approximate — we should re-check the vendor pricing pages before we buy.)
+Recommendation
+I now recommend Frankfurter v2 as our default conversion service for the product, because it is free, supports AED/SAR, supports conversion by date, and matched our POC numbers well.
+
+If the company later needs a paid vendor contract / formal SLA, we can switch to:
+- Open Exchange Rates (preferred paid option), or
+- ExchangeRate-API (if price is the main constraint)
+
+Our test app is already wired to Frankfurter v2. Please see the attached PDF: Currency_Conversion_Service_Recommendation.pdf.
+
+Happy to walk through this on a short call.
 
 Thanks,
 [Your Name]
