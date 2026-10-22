@@ -87,7 +87,7 @@ REST_FRAMEWORK = {
 }
 
 # FX provider configuration — see currency/services.py and README
-FX_PROVIDER = os.getenv("FX_PROVIDER", "openexchangerates")
+FX_PROVIDER = os.getenv("FX_PROVIDER", "frankfurter")
 EXCHANGE_RATE_API_KEY = os.getenv("EXCHANGE_RATE_API_KEY", "")
 OPEN_EXCHANGE_RATES_APP_ID = os.getenv("OPEN_EXCHANGE_RATES_APP_ID", "")
 
