@@ -1,4 +1,4 @@
-Subject: Recommendation — which currency conversion service we should use
+Subject: Recommendation — which currency conversion service we should use (free vs paid)
 
 Hi [Lead Name] / [PM Name],
 
@@ -11,19 +11,25 @@ The three services were:
 
 I compared them with our reference numbers (22 Oct 2026: 10,000 INR ≈ 105.43 USD / 388.90 AED). Please see the attached PDF: Currency_Conversion_Service_Recommendation.pdf.
 
+About the free versions
+Both Open Exchange Rates and ExchangeRate-API have free plans that are useful for testing / POC:
+- Open Exchange Rates free: about 1,000 requests per month, mainly today’s / latest rates
+- ExchangeRate-API free: about 1,500 requests per month, mainly today’s / latest rates
+
+So on free, ExchangeRate-API gives a slightly higher monthly call limit. Important: free plans are mostly for latest rates. Reliable conversion using a past date (invoice / booking date) generally needs a paid plan on both services. Free community feeds should not be used for a real company product.
+
 My recommendation
-I recommend Open Exchange Rates (paid plan) as our main service for production.
+- For production (paid): Open Exchange Rates as our main service
+- If price is the main concern (paid): ExchangeRate-API as the budget alternative
+- For testing now (free): either free plan is fine for a POC; ExchangeRate-API free allows a few more monthly calls
 
-Why Open Exchange Rates instead of ExchangeRate-API
-- Better support for converting using a past date (important for invoices / bookings on a specific day), not only today’s rate.
-- Better fit for a company product: clearer paid service, commonly used by application backends.
-- Easier to keep a proper record: we can save “which rate we used and on which date” on each transaction.
-- Covers the currencies we need (INR, USD, AED, SAR, and more) in one standard approach.
+Why Open Exchange Rates over ExchangeRate-API for production
+- Better support for converting using a past date (important for invoices / bookings), not only today’s rate
+- Better fit for a company product (clear paid service, commonly used by application backends)
+- Easier to keep a proper record: save which rate we used and on which date
+- Covers the currencies we need (INR, USD, AED, SAR, and more)
 
-If price is the main concern
-We can use ExchangeRate-API (paid) instead. In our tests accuracy was close, and it is usually a bit cheaper. Our app can switch to it with a simple setting. I would treat it as the budget option — not the free community feeds.
-
-Happy to walk through this on a short call.
+Happy to walk through this on a short call. (Free-plan numbers above are approximate — we should re-check the vendor pricing pages before we buy.)
 
 Thanks,
 [Your Name]
