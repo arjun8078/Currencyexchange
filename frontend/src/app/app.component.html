@@ -93,10 +93,14 @@
 
   <footer>
     <p>
-      Active provider: <code>{{ provider() }}</code>. Default is
-      <strong>Open Exchange Rates</strong> (production recommendation). For a
-      lower-cost alternate, switch to ExchangeRate-API via
-      <code>FX_PROVIDER</code>.
+      Active provider: <code>{{ provider() }}</code>.
+      @if (provider() === 'frankfurter') {
+        Using <strong>Frankfurter v2</strong> (free, no API key) —
+        includes USD, AED, SAR and date-based rates via
+        <code>api.frankfurter.dev/v2/rates</code>.
+      } @else {
+        Production default is Open Exchange Rates; ExchangeRate-API is the budget alternate.
+      }
     </p>
   </footer>
 </div>

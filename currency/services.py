@@ -70,27 +70,58 @@ def _quantize_rate(value: Decimal) -> Decimal:
 
 class FrankfurterProvider:
     """
-    ECB reference rates via Frankfurter (free, no API key).
-    Strong for EUR majors + INR/USD. Does NOT publish AED.
+    Frankfurter v2 (free, no API key) — https://api.frankfurter.dev/v2/rates
+
+    v1 (api.frankfurter.app) was ECB-only and lacked AED/SAR.
+    v2 supports wide quotes including INR, USD, AED, SAR + historical dates.
     """
 
     name = "frankfurter"
-    base_url = "https://api.frankfurter.app"
+    base_url = "https://api.frankfurter.dev/v2"
 
     def get_rate(self, from_currency: str, to_currency: str, on: date) -> RateResult:
         if from_currency == to_currency:
             return RateResult(Decimal("1"), on)
 
-        url = f"{self.base_url}/{on.isoformat()}"
-        params = {"from": from_currency, "to": to_currency}
+        # Lead-confirmed shape:
+        # /v2/rates?base=INR&quotes=AED&date=2026-10-20
+        url = f"{self.base_url}/rates"
+        params = {
+            "base": from_currency,
+            "quotes": to_currency,
+            "date": on.isoformat(),
+        }
         with httpx.Client(timeout=15.0, follow_redirects=True) as client:
             response = client.get(url, params=params)
+            if response.status_code == 404:
+                raise ValueError(
+                    f"Frankfurter v2 has no rate for {from_currency}->{to_currency} on {on}."
+                )
             response.raise_for_status()
             payload = response.json()
 
-        rate = Decimal(str(payload["rates"][to_currency]))
-        rate_date = date.fromisoformat(payload["date"])
-        return RateResult(_quantize_rate(rate), rate_date)
+        # Response is a list: [{"date","base","quote","rate"}, ...]
+        rows = payload if isinstance(payload, list) else [payload]
+        if not rows:
+            raise ValueError(
+                f"Frankfurter v2 returned no rows for {from_currency}->{to_currency} on {on}."
+            )
+
+        match = next(
+            (
+                row
+                for row in rows
+                if str(row.get("quote", "")).upper() == to_currency
+                and str(row.get("base", "")).upper() == from_currency
+            ),
+            rows[0],
+        )
+        if "rate" not in match:
+            raise ValueError(f"Frankfurter v2 response missing rate: {match}")
+
+        rate = _quantize_rate(Decimal(str(match["rate"])))
+        rate_date = date.fromisoformat(str(match.get("date") or on.isoformat()))
+        return RateResult(rate, rate_date)
 
 
 class CurrencyApiProvider:
