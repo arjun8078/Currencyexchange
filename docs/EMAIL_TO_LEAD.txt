@@ -1,29 +1,27 @@
-Subject: FX provider recommendation — Open Exchange Rates (with ExchangeRate-API as budget option)
+Subject: Recommendation — which currency conversion service we should use
 
 Hi [Lead Name] / [PM Name],
 
-I researched three currency exchange services for our Angular + Django production use case (convert INR/local amounts to USD, AED, SAR, etc., including rate for a user-entered date):
+I researched three online services that give us currency conversion rates (for example: convert Indian Rupees to US Dollars or UAE Dirhams) for our product.
 
+The three services were:
 1. Open Exchange Rates — https://openexchangerates.org/
 2. ExchangeRate-API — https://www.exchangerate-api.com/
-3. CurrencyAPI / community CDN-style feeds (used only for prototype comparison)
+3. CurrencyAPI / free community feeds (okay for demos only — not for a company product)
 
-I also compared outputs against our reference pack (22/10/2026, 10,000 INR → ~105.43 USD / ~388.90 AED). Please see the attached FX_PROVIDER_RECOMMENDATION.pdf (and the earlier Currency Exchange screenshots).
+I compared them with our reference numbers (22 Oct 2026: 10,000 INR ≈ 105.43 USD / 388.90 AED). Please see the attached PDF: Currency_Conversion_Service_Recommendation.pdf.
 
-Recommendation
-I recommend Open Exchange Rates (paid) as our primary production provider.
+My recommendation
+I recommend Open Exchange Rates (paid plan) as our main service for production.
 
-Why Open Exchange Rates over ExchangeRate-API
-- Historical / date-based rates are a first-class paid capability — important when bookings or invoices must use the FX of the selected date, not only today’s rate.
-- Stronger production fit: App ID model, widely used in backends, clearer commercial licensing and ops maturity for a company product.
-- Better alignment with audit needs: we can fetch a dated rate and store rate + rate_date + provider on each transaction.
-- Multi-currency (INR, USD, AED, SAR) fits a standard USD-base pipeline in Django.
+Why Open Exchange Rates instead of ExchangeRate-API
+- Better support for converting using a past date (important for invoices / bookings on a specific day), not only today’s rate.
+- Better fit for a company product: clearer paid service, commonly used by application backends.
+- Easier to keep a proper record: we can save “which rate we used and on which date” on each transaction.
+- Covers the currencies we need (INR, USD, AED, SAR, and more) in one standard approach.
 
-If price is the deciding factor
-We can switch to ExchangeRate-API (paid). In our POC it felt close on USD/AED accuracy and is typically a bit cheaper. The codebase already supports a one-line env switch (FX_PROVIDER=exchangerateapi). I would treat that as the budget alternate, not the community CDN feeds (not suitable for production).
-
-Code status
-The repo default is now Open Exchange Rates. After you pull latest main locally, set OPEN_EXCHANGE_RATES_APP_ID in .env and run as documented in the README.
+If price is the main concern
+We can use ExchangeRate-API (paid) instead. In our tests accuracy was close, and it is usually a bit cheaper. Our app can switch to it with a simple setting. I would treat it as the budget option — not the free community feeds.
 
 Happy to walk through this on a short call.
 
